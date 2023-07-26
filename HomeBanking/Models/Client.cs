@@ -1,4 +1,6 @@
-﻿namespace HomeBanking.Models
+﻿using System.Collections.Generic;
+
+namespace HomeBanking.Models
 {
     public class Client
     {
@@ -7,5 +9,8 @@
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
+        public ICollection<Account> Accounts { get; set; }
+
+
     }
 }
