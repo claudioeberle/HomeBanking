@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeBanking.Migrations
 {
     [DbContext(typeof(HomeBankingContext))]
-    [Migration("20230724154035_InitialCreate")]
+    [Migration("20230726021310_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
