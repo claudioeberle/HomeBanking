@@ -1,17 +1,62 @@
 ﻿using HomeBanking.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace HomeBanking.Repositories
 {
-    //public class RepositoryBase<T> : IRepositoryBase<T> where T : class
-    //{
-    //    protected HomeBankingContext RepositoryContext { get; set; }
+    public abstract class RepositoryBase<T> : IRepositoryBase<T> where T : class
+    {
+        protected HomeBankingContext RepositoryContext { get; set; }
 
-    //    public RepositoryBase(HomeBankingContext repositoryContext)
-    //    {
-    //        RepositoryContext = repositoryContext;
-    //    }
+        public RepositoryBase(HomeBankingContext repositoryContext)
+        {
+            RepositoryContext = repositoryContext;
+        }
 
-    //    public 
-        
-    //}
+        public IQueryable<T> FindAll() 
+        {
+            //return this.RepositoryContext.Set<T>().AsNoTracking();
+            return this.RepositoryContext.Set<T>().AsNoTrackingWithIdentityResolution();
+        }
+
+        public IQueryable<T> FindAll(Func<IQueryable<T>, IIncludableQueryable<T,object>> includes = null)
+        {
+            IQueryable<T> queryable = this.RepositoryContext.Set<T>();
+
+            if(includes != null)
+            {
+                queryable = includes(queryable);
+            }
+            return queryable.AsNoTrackingWithIdentityResolution();
+        }
+
+        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> condition)
+        {
+            return this.RepositoryContext.Set<T>().Where(condition).AsNoTrackingWithIdentityResolution();
+        }
+
+        public void Create(T entity)
+        {
+            this.RepositoryContext.Set<T>().Add(entity);
+        }
+
+        public void Update(T entity)
+        {
+            this.RepositoryContext.Set<T>().Update(entity);
+        }
+
+        public void Delete(T entity)
+        {
+            this.RepositoryContext.Set<T>().Remove(entity);
+        }
+
+        public void SaveChanges()
+        {
+            this.RepositoryContext.SaveChanges();
+        }
+
+    }
 }
