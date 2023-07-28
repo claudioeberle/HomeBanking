@@ -11,12 +11,17 @@ namespace HomeBanking.Repositories
 
         public Client FindById(long id)
         {
-            return FindByCondition(client =>  client.Id == id).Include(client => client.Accounts).FirstOrDefault();
+            return FindByCondition(client =>  client.Id == id).
+                    Include(client => client.Accounts).
+                    Include(client => client.ClientLoans).
+                    ThenInclude(clientLoan => clientLoan.Loan).FirstOrDefault();
         }
 
         public IEnumerable<Client> GetAllClients()
         {
-            return FindAll().Include(client => client.Accounts).ToList();
+            return FindAll().Include(client => client.Accounts).
+                             Include(client => client.ClientLoans).
+                             ThenInclude(clientLoan => clientLoan.Loan).ToList();
         }
 
         public void Save(Client client)
