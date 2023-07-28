@@ -30,6 +30,8 @@ namespace HomeBanking
             services.AddDbContext<HomeBankingContext>(options => options.UseSqlServer(Configuration.GetConnectionString("HomeBankingConnection")));
             //Add ClientRepository to services
             services.AddScoped<IClientRepository, ClientRepository>();
+            //Add AccountRepository to services
+            services.AddScoped<IAccountRepository, AccountRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +56,7 @@ namespace HomeBanking
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+
             });
         }
     }

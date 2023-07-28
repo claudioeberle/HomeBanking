@@ -16,7 +16,7 @@ namespace HomeBanking.Repositories
 
         public IEnumerable<Client> GetAllClients()
         {
-            return FindAll().Include(client => client.Accounts).ToList<Client>();
+            return FindAll().Include(client => client.Accounts).ToList();
         }
 
         public void Save(Client client)
