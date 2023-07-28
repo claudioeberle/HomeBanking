@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace HomeBanking
@@ -32,6 +33,8 @@ namespace HomeBanking
             services.AddScoped<IClientRepository, ClientRepository>();
             //Add AccountRepository to services
             services.AddScoped<IAccountRepository, AccountRepository>();
+
+            services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,7 +59,6 @@ namespace HomeBanking
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
-
             });
         }
     }

@@ -43,6 +43,7 @@ namespace HomeBanking.Controllers
                             Type = tr.Type,
                             Amount = tr.Amount,
                             Description = tr.Description
+
                         }).ToList(),
                     };
                     accountsDTO.Add(accountDTO);
@@ -71,6 +72,8 @@ namespace HomeBanking.Controllers
                 AccountDTO accountDTO = new AccountDTO
                 {
                     Id = account.Id,
+
+                    Number = account.Number,
 
                     CreationDate = account.CreationDate,
 
