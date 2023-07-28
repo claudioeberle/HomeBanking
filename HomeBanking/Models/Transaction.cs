@@ -10,6 +10,6 @@ namespace HomeBanking.Models
         public string Description { get; set; }
         public DateTime Date { get; set; }
         public long AccountId { get; set; }
-        public Account Account { get; set; }
+        public Account Account { get; set;}
     }
 }
