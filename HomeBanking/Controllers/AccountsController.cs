@@ -72,6 +72,8 @@ namespace HomeBanking.Controllers
                 {
                     Id = account.Id,
 
+                    Number = account.Number,
+
                     CreationDate = account.CreationDate,
 
                     Balance = account.Balance,
