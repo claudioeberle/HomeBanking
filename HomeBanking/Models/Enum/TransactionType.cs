@@ -1,4 +1,4 @@
-﻿namespace HomeBanking.Models
+﻿namespace HomeBanking.Models.Enum
 {
     public enum TransactionType
     {

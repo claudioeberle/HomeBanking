@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace HomeBanking.Models
+namespace HomeBanking.Models.DTOs
 {
     public class TransactionDTO
     {

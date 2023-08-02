@@ -1,4 +1,5 @@
 ﻿using HomeBanking.Models;
+using HomeBanking.Models.DTOs;
 using HomeBanking.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,6 +42,27 @@ namespace HomeBanking.Controllers
                             Balance = ac.Balance,
                             CreationDate = ac.CreationDate,
                             Number = ac.Number,
+                            
+                        }).ToList(),
+                        Credits = client.ClientLoans.Select(cl => new ClientLoanDTO
+                        {
+                            Id = cl.Id,
+                            LoanId = cl.LoanId,
+                            Name = cl.Loan.Name,
+                            Amount = cl.Amount,
+                            Payments = Int32.Parse(cl.Payments)
+
+                        }).ToList(),
+                        Cards = client.Cards.Select(cl => new CardDTO
+                        {
+                            Id = cl.Id,
+                            CardHolder = cl.CardHolder,
+                            Color = cl.Color,
+                            Cvv = cl.Cvv,
+                            FromDate = cl.FromDate,
+                            ThruDate = cl.ThruDate,
+                            Number = cl.Number,
+                            Type = cl.Type,
 
                         }).ToList()
                     };
@@ -89,6 +111,28 @@ namespace HomeBanking.Controllers
                         CreationDate = ac.CreationDate,
 
                         Number = ac.Number
+
+                    }).ToList(),
+
+                    Credits = client.ClientLoans.Select(cl => new ClientLoanDTO
+                    {
+                        Id = cl.Id,
+                        LoanId = cl.LoanId,
+                        Name = cl.Loan.Name,
+                        Amount = cl.Amount,
+                        Payments = Int32.Parse(cl.Payments)
+
+                    }).ToList(),
+                    Cards = client.Cards.Select(cl => new CardDTO
+                    {
+                        Id = cl.Id,
+                        CardHolder = cl.CardHolder,
+                        Color = cl.Color,
+                        Cvv = cl.Cvv,
+                        FromDate = cl.FromDate,
+                        ThruDate = cl.ThruDate,
+                        Number = cl.Number,
+                        Type = cl.Type,
 
                     }).ToList()
                 };

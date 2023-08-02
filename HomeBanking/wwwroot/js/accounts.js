@@ -6,7 +6,7 @@ var app = new Vue({
     },
     methods:{
         getData: function(){
-            axios.get("/api/clients/1")
+            axios.get("/api/clients/7")
             .then(function (response) {
                 //get client ifo
                 app.clientInfo = response.data;

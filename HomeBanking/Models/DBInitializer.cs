@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using HomeBanking.Models.Enum;
 
 namespace HomeBanking.Models
 {
@@ -176,6 +177,50 @@ namespace HomeBanking.Models
                     context.SaveChanges();
                 }
             }
+
+            if (!context.Cards.Any())
+            {
+                Random random = new Random();
+
+                foreach (Client client in context.Clients)
+                {
+                    if (client != null)
+                    {
+                        Card[] newCards = new Card[]
+                        {
+                            new Card
+                            {
+                                ClientId = client.Id,
+                                CardHolder = client.FirstName + " " + client.LastName,
+                                Type = CardType.DEBIT.ToString(),
+                                Color = CardColor.GOLD.ToString(),
+                                Number = $"{random.Next(1111, 9999)}-{random.Next(1111, 9999)}-{random.Next(1111, 9999)}-{random.Next(1111, 9999)}",
+                                Cvv = random.Next(111, 999),
+                                FromDate = DateTime.Now,
+                                ThruDate = DateTime.Now.AddYears(4),
+                            },
+
+                            new Card
+                            {
+                                ClientId = client.Id,
+                                CardHolder = client.FirstName + " " + client.LastName,
+                                Type = CardType.CREDIT.ToString(),
+                                Color = CardColor.TITANIUM.ToString(),
+                                Number = $"{random.Next(1111, 9999)}-{random.Next(1111, 9999)}-{random.Next(1111, 9999)}-{random.Next(1111, 9999)}",
+                                Cvv = random.Next(111,999),
+                                FromDate = DateTime.Now,
+                                ThruDate= DateTime.Now.AddYears(4),
+                            },
+                        };
+                        foreach (Card card in newCards)
+                        {
+                            context.Cards.Add(card);
+                        }
+                    }
+                }
+                context.SaveChanges();
+            }
         }
     }
+
 }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace HomeBanking.Models
+namespace HomeBanking.Models.DTOs
 {
     public class ClientDTO
     {
@@ -16,5 +16,9 @@ namespace HomeBanking.Models
         public string Email { get; set; }
 
         public ICollection<AccountDTO> Accounts { get; set; }
+
+        public ICollection<ClientLoanDTO> Credits { get; set; }
+
+        public ICollection<CardDTO> Cards { get; set; }
     }
 }
