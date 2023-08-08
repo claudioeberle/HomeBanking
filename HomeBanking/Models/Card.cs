@@ -19,14 +19,12 @@ namespace HomeBanking.Models
 
         public static bool IsCardType(string cardType)
         {
-            CardType result;
-            return CardType.TryParse(cardType, out result);
+            return CardType.TryParse(cardType, out CardType result);
         }
 
         public static bool IsCardColor(string cardColor)
         {
-            CardColor result;
-            return CardColor.TryParse(cardColor, out result);
+            return CardColor.TryParse(cardColor, out CardColor result);
         }
     }
 }
