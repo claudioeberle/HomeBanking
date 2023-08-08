@@ -14,10 +14,12 @@ namespace HomeBanking.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
+        private IClientRepository _clientRepository;
         private IAccountRepository _accountRepository;
 
-        public AccountsController(IAccountRepository accountRepository)
+        public AccountsController(IClientRepository clientRepository, IAccountRepository accountRepository)
         {
+            _clientRepository = clientRepository;
             _accountRepository = accountRepository;
         }
 
@@ -102,5 +104,7 @@ namespace HomeBanking.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        
     }
 }

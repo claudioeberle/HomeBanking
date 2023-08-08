@@ -48,6 +48,8 @@ namespace HomeBanking
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ClientOnly", policy => policy.RequireClaim("Client"));
+                options.AddPolicy("AdminOnly", policy => policy.RequireClaim("Admin"));
+
             });
         }
 

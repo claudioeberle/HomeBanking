@@ -14,10 +14,12 @@ namespace HomeBanking.Controllers
     public class ClientsController : ControllerBase
     {
         private IClientRepository _clientRepository;
+        private IAccountRepository _accountRepository;
 
-        public ClientsController(IClientRepository clientRepository)
+        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository)
         {
             _clientRepository = clientRepository;
+            _accountRepository = accountRepository;
         }
 
         [HttpGet]
@@ -243,5 +245,65 @@ namespace HomeBanking.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
+
+        [HttpPost("current/accounts")]
+        public IActionResult Post()
+        {
+            Random rnd = new Random();
+            Account account;
+            string newAccountNumber;
+
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : String.Empty;
+                if (email == String.Empty)
+                {
+                    return Forbid();
+                }
+
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    return Forbid("No existe el cliente");
+                }
+
+                if (client.Accounts.Count >= 3)
+                {
+                    return Forbid("Supera el máximo de cuentas permitidas");
+                }
+
+                do
+                {
+                    newAccountNumber = "VIN-" + rnd.Next(1, 99999999);
+                    account = _accountRepository.FindByNumber(newAccountNumber);
+                }
+                while (account != null);
+
+
+                Account newAccount = new Account
+                {
+                    Number = newAccountNumber,
+                    CreationDate = DateTime.Now,
+                    Balance = 0.0,
+                    ClientId = client.Id,
+                };
+
+                _accountRepository.Save(newAccount);
+
+                return Created("", newAccount);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("current/cards")]
+        public IActionResult Post([FromBody] Card card)
+        {
+
+        }
+
     }
 }
