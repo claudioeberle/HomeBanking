@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 
 namespace HomeBanking.Controllers
 {
@@ -15,11 +16,13 @@ namespace HomeBanking.Controllers
     {
         private IClientRepository _clientRepository;
         private IAccountRepository _accountRepository;
+        private ICardRepository _cardRepository;
 
-        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository)
+        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository, ICardRepository cardRepository)
         {
             _clientRepository = clientRepository;
             _accountRepository = accountRepository;
+            _cardRepository = cardRepository;
         }
 
         [HttpGet]
@@ -267,11 +270,13 @@ namespace HomeBanking.Controllers
                     return Forbid("No existe el cliente");
                 }
 
+                //validate max accounts
                 if (client.Accounts.Count >= 3)
                 {
                     return Forbid("Supera el máximo de cuentas permitidas");
                 }
 
+                //look for existing account number
                 do
                 {
                     newAccountNumber = "VIN-" + rnd.Next(1, 99999999);
@@ -299,11 +304,66 @@ namespace HomeBanking.Controllers
             }
         }
 
+        
         [HttpPost("current/cards")]
         public IActionResult Post([FromBody] Card card)
         {
+            Random rnd = new Random();
+            string newCardNumber;
+            Card cardAux;
 
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : String.Empty;
+                if (email == String.Empty)
+                {
+                    return Forbid("Don't have authorization");
+                }
+
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    return Forbid("Client doesn't exist");
+                }
+
+                //validate data
+                if (String.IsNullOrEmpty(card.Type) ||
+                    String.IsNullOrEmpty(card.Color) ||
+                    !Card.IsCardType(card.Type) ||
+                    !Card.IsCardColor(card.Color))
+                {
+                    return StatusCode(403, "Datos Inválidos");
+                }
+
+                //look for existing card number
+                do
+                {
+                    newCardNumber = $"{rnd.Next(1111, 9999)}-{rnd.Next(1111, 9999)}-{rnd.Next(1111, 9999)}-{rnd.Next(1111, 9999)}";
+                    cardAux = _cardRepository.FindByNumber(newCardNumber);
+                }
+                while (cardAux != null);
+
+                Card newCard = new Card()
+                {
+                    CardHolder = $"{client.FirstName} {client.LastName}",
+                    Type = card.Type,
+                    Color = card.Color,
+                    Number = newCardNumber,
+                    Cvv = rnd.Next(111, 999),
+                    FromDate = DateTime.Now,
+                    ThruDate = DateTime.Now.AddYears(5),
+                    ClientId = client.Id,
+                };
+
+                _cardRepository.Save(newCard);
+
+                return Created("", newCard);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
-
     }
 }

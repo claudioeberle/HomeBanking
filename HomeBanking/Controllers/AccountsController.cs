@@ -14,12 +14,10 @@ namespace HomeBanking.Controllers
     [ApiController]
     public class AccountsController : ControllerBase
     {
-        private IClientRepository _clientRepository;
         private IAccountRepository _accountRepository;
 
-        public AccountsController(IClientRepository clientRepository, IAccountRepository accountRepository)
+        public AccountsController(IAccountRepository accountRepository)
         {
-            _clientRepository = clientRepository;
             _accountRepository = accountRepository;
         }
 
