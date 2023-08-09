@@ -17,17 +17,6 @@ namespace HomeBanking.Repositories
             return FindByCondition(card => card.Number == number).FirstOrDefault();
         }
 
-        public IEnumerable<Card> GetAllCards()
-        {
-            return FindAll().ToList();
-        }
-
-        public IEnumerable<Card> GetCardByClient(long clientId)
-        {
-            return FindByCondition(card => card.ClientId == clientId)
-                .ToList();
-        }
-
         public void Save(Card card)
         {
             Create(card);

@@ -212,6 +212,10 @@ namespace HomeBanking.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] Client client) 
         {
+            Random rnd = new Random();
+            Account account;
+            string newAccountNumber;
+
             try
             {
                 //validate data
@@ -239,7 +243,25 @@ namespace HomeBanking.Controllers
                     LastName = client.LastName,
                 };
 
+                //look for existing account number
+                do
+                {
+                    newAccountNumber = "VIN-" + rnd.Next(1, 99999999);
+                    account = _accountRepository.FindByNumber(newAccountNumber);
+                }
+                while (account != null);
+
                 _clientRepository.Save(newClient);
+
+                Account newAccount = new Account
+                {
+                    Number = newAccountNumber,
+                    CreationDate = DateTime.Now,
+                    Balance = 0.0,
+                    ClientId = newClient.Id,
+                };
+
+                _accountRepository.Save(newAccount);
                 return Created("", newClient);
 
             }
@@ -250,7 +272,7 @@ namespace HomeBanking.Controllers
         }
 
         [HttpPost("current/accounts")]
-        public IActionResult Post()
+        public IActionResult PostAccount()
         {
             Random rnd = new Random();
             Account account;
@@ -303,10 +325,9 @@ namespace HomeBanking.Controllers
                 return StatusCode(500, ex.Message);
             }
         }
-
         
         [HttpPost("current/cards")]
-        public IActionResult Post([FromBody] Card card)
+        public IActionResult PostCard([FromBody] Card card)
         {
             Random rnd = new Random();
             string newCardNumber;
