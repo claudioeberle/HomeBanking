@@ -225,7 +225,7 @@ namespace HomeBanking.Controllers
                     String.IsNullOrEmpty(client.FirstName) ||
                     String.IsNullOrEmpty(client.LastName))
                 {
-                    return StatusCode(403, "Datos Inválidos");
+                    return StatusCode(403, "Invalid Data");
                 }
 
                 //look for existing user
@@ -233,7 +233,7 @@ namespace HomeBanking.Controllers
 
                 if (user != null)
                 {
-                    return StatusCode(403, "El Email ya está en uso");
+                    return StatusCode(403, "email already in use");
                 }
 
                 Client newClient = new Client
@@ -248,7 +248,7 @@ namespace HomeBanking.Controllers
                 AccountDTO newAccount = _accountsController.Post(newClient.Id); 
                 if(newAccount ==  null)
                 {
-                    return StatusCode(500, "No se pudo crear la nueva cuenta");
+                    return StatusCode(500, "account not created at accountsController");
                 }
                 return Created("", newClient);
             }
@@ -309,20 +309,20 @@ namespace HomeBanking.Controllers
                 Client client = _clientRepository.FindByEmail(email);
                 if (client == null)
                 {
-                    return Forbid("No existe el cliente");
+                    return Forbid("not existing client");
                 }
 
                 //validate max accounts
                 if (client.Accounts.Count >= 3)
                 {
-                    return Forbid("Supera el máximo de cuentas permitidas");
+                    return Forbid("$\"Over max 3 cards permitted\"");
                 }
 
                 var account = _accountsController.Post(client.Id);
 
                 if(account == null) 
                 {
-                    return StatusCode(500, "No se logró crear una nueva cuenta");
+                    return StatusCode(500, "account not created at accountsController");
                 }
 
                 return Created("", account);
@@ -393,7 +393,7 @@ namespace HomeBanking.Controllers
                 Client client = _clientRepository.FindByEmail(email);
                 if (client == null)
                 {
-                    return Forbid("Client does not exist");
+                    return Forbid("Not existing client");
                 }
                 
                 //validate data
@@ -423,7 +423,7 @@ namespace HomeBanking.Controllers
                 CardDTO newCardDTO = _cardsController.Post(cardHolder, client.Id, card);
                 if(newCardDTO == null)
                 {
-                    return StatusCode(403, "Card not created at cardController");
+                    return StatusCode(403, "Card not created at cardsController");
                 }
 
                 return Created("", newCardDTO);
