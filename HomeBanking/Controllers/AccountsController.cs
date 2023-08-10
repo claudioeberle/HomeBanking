@@ -103,6 +103,49 @@ namespace HomeBanking.Controllers
             }
         }
 
-        
+        [HttpPost]
+        public AccountDTO Post(long clientId)
+        {
+            Random rnd = new Random();
+            Account account;
+            string newAccountNumber;
+
+            try
+            {
+
+                //look for existing account number
+                do
+                {
+                    newAccountNumber = "VIN-" + rnd.Next(1, 99999999);
+                    account = _accountRepository.FindByNumber(newAccountNumber);
+                }
+                while (account != null);
+
+
+                Account newAccount = new Account
+                {
+                    Number = newAccountNumber,
+                    CreationDate = DateTime.Now,
+                    Balance = 0.0,
+                    ClientId = clientId
+                };
+
+                _accountRepository.Save(newAccount);
+
+                AccountDTO accountDTO = new AccountDTO
+                {
+                    Id = newAccount.Id,
+                    Number = newAccount.Number,
+                    CreationDate = newAccount.CreationDate,
+                    Balance = newAccount.Balance,
+                };
+                return accountDTO;
+
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

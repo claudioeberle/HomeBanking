@@ -8,13 +8,16 @@ namespace HomeBanking.Repositories
 {
     public class CardRepository : RepositoryBase<Card>, ICardRepository
     {
-        public CardRepository(HomeBankingContext repositoryContext) : base(repositoryContext)
-        {
-        }
+        public CardRepository(HomeBankingContext repositoryContext) : base(repositoryContext){}
 
         public Card FindByNumber(string number)
         {
             return FindByCondition(card => card.Number == number).FirstOrDefault();
+        }
+
+        public IEnumerable<Card> GetAllCards()
+        {
+            throw new System.NotImplementedException();
         }
 
         public void Save(Card card)

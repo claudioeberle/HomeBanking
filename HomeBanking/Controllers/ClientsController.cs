@@ -1,5 +1,6 @@
 ﻿using HomeBanking.Models;
 using HomeBanking.Models.DTOs;
+using HomeBanking.Models.Enum;
 using HomeBanking.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,14 +16,14 @@ namespace HomeBanking.Controllers
     public class ClientsController : ControllerBase
     {
         private IClientRepository _clientRepository;
-        private IAccountRepository _accountRepository;
-        private ICardRepository _cardRepository;
+        private AccountsController _accountsController;
+        private CardsController _cardsController;
 
-        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository, ICardRepository cardRepository)
+        public ClientsController(IClientRepository clientRepository, AccountsController accountsController, CardsController cardsController)
         {
             _clientRepository = clientRepository;
-            _accountRepository = accountRepository;
-            _cardRepository = cardRepository;
+            _accountsController = accountsController;
+            _cardsController = cardsController;
         }
 
         [HttpGet]
@@ -242,28 +243,51 @@ namespace HomeBanking.Controllers
                     FirstName = client.FirstName,
                     LastName = client.LastName,
                 };
-
-                //look for existing account number
-                do
-                {
-                    newAccountNumber = "VIN-" + rnd.Next(1, 99999999);
-                    account = _accountRepository.FindByNumber(newAccountNumber);
-                }
-                while (account != null);
-
                 _clientRepository.Save(newClient);
 
-                Account newAccount = new Account
+                AccountDTO newAccount = _accountsController.Post(newClient.Id); 
+                if(newAccount ==  null)
                 {
-                    Number = newAccountNumber,
-                    CreationDate = DateTime.Now,
-                    Balance = 0.0,
-                    ClientId = newClient.Id,
-                };
-
-                _accountRepository.Save(newAccount);
+                    return StatusCode(500, "No se pudo crear la nueva cuenta");
+                }
                 return Created("", newClient);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
 
+        [HttpGet("current/accounts")]
+        public IActionResult GetAccounts()
+        {
+            IEnumerable<AccountDTO> accounts;
+
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : String.Empty;
+                if (email == String.Empty)
+                {
+                    return Forbid();
+                }
+
+                Client client = _clientRepository.FindByEmail(email);
+
+                if (client == null)
+                {
+                    return Forbid();
+                }
+
+                accounts = client.Accounts.Select(ac => new AccountDTO
+                {
+                    Id = ac.Id,
+                    Balance = ac.Balance,
+                    CreationDate = ac.CreationDate,
+                    Number = ac.Number,
+                }).ToList();
+                
+
+                return Ok(accounts);
             }
             catch (Exception ex)
             {
@@ -274,10 +298,6 @@ namespace HomeBanking.Controllers
         [HttpPost("current/accounts")]
         public IActionResult PostAccount()
         {
-            Random rnd = new Random();
-            Account account;
-            string newAccountNumber;
-
             try
             {
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : String.Empty;
@@ -298,87 +318,115 @@ namespace HomeBanking.Controllers
                     return Forbid("Supera el máximo de cuentas permitidas");
                 }
 
-                //look for existing account number
-                do
+                var account = _accountsController.Post(client.Id);
+
+                if(account == null) 
                 {
-                    newAccountNumber = "VIN-" + rnd.Next(1, 99999999);
-                    account = _accountRepository.FindByNumber(newAccountNumber);
+                    return StatusCode(500, "No se logró crear una nueva cuenta");
                 }
-                while (account != null);
 
-
-                Account newAccount = new Account
-                {
-                    Number = newAccountNumber,
-                    CreationDate = DateTime.Now,
-                    Balance = 0.0,
-                    ClientId = client.Id,
-                };
-
-                _accountRepository.Save(newAccount);
-
-                return Created("", newAccount);
-
+                return Created("", account);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, ex.Message);
             }
         }
-        
-        [HttpPost("current/cards")]
-        public IActionResult PostCard([FromBody] Card card)
+
+        [HttpGet("current/cards")]
+        public IActionResult GetCards()
         {
-            Random rnd = new Random();
-            string newCardNumber;
-            Card cardAux;
+            IEnumerable<CardDTO> cards;
 
             try
             {
                 string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : String.Empty;
                 if (email == String.Empty)
                 {
-                    return Forbid("Don't have authorization");
+                    return Forbid();
+                }
+
+                Client client = _clientRepository.FindByEmail(email);
+
+                if (client == null)
+                {
+                    return Forbid();
+                }
+
+                cards = client.Cards.Select(ac => new CardDTO
+                {
+                    Id = ac.Id,
+                    CardHolder = ac.CardHolder,
+                    Color = ac.Color,
+                    Cvv = ac.Cvv,
+                    FromDate = ac.FromDate,
+                    Number = ac.Number,
+                    ThruDate = ac.ThruDate,
+                    Type = ac.Type
+
+                }).ToList();
+
+
+                return Ok(cards);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("current/cards")]
+        public IActionResult PostCard([FromBody] Card card)
+        {
+            string cardHolder = String.Empty;
+            string newCardType = String.Empty;
+            int cardsAmount = 0;
+
+            try
+            {
+                string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : String.Empty;
+                if (email == String.Empty)
+                {
+                    return Forbid("Do not have authorization");
                 }
 
                 Client client = _clientRepository.FindByEmail(email);
                 if (client == null)
                 {
-                    return Forbid("Client doesn't exist");
+                    return Forbid("Client does not exist");
                 }
-
+                
                 //validate data
                 if (String.IsNullOrEmpty(card.Type) ||
                     String.IsNullOrEmpty(card.Color) ||
                     !Card.IsCardType(card.Type) ||
                     !Card.IsCardColor(card.Color))
                 {
-                    return StatusCode(403, "Datos Inválidos");
+                    return StatusCode(403, "Invalid Data");
                 }
 
-                //look for existing card number
-                do
+                foreach(Card cardAux in client.Cards)
                 {
-                    newCardNumber = $"{rnd.Next(1111, 9999)}-{rnd.Next(1111, 9999)}-{rnd.Next(1111, 9999)}-{rnd.Next(1111, 9999)}";
-                    cardAux = _cardRepository.FindByNumber(newCardNumber);
+                    if(cardAux.Type == card.Type)
+                    {
+                        cardsAmount++;
+                    }
                 }
-                while (cardAux != null);
 
-                Card newCard = new Card()
+                if(cardsAmount >= 3)
                 {
-                    CardHolder = $"{client.FirstName} {client.LastName}",
-                    Type = card.Type,
-                    Color = card.Color,
-                    Number = newCardNumber,
-                    Cvv = rnd.Next(111, 999),
-                    FromDate = DateTime.Now,
-                    ThruDate = DateTime.Now.AddYears(5),
-                    ClientId = client.Id,
-                };
+                    return Forbid($"Over max card type {card.Type} permitted");
+                }
 
-                _cardRepository.Save(newCard);
+                cardHolder = $"{client.FirstName} {client.LastName}";
 
-                return Created("", newCard);
+                CardDTO newCardDTO = _cardsController.Post(cardHolder, client.Id, card);
+                if(newCardDTO == null)
+                {
+                    return StatusCode(403, "Card not created at cardController");
+                }
+
+                return Created("", newCardDTO);
 
             }
             catch (Exception ex)
