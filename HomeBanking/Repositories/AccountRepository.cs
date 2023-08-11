@@ -48,17 +48,6 @@ namespace HomeBanking.Repositories
                 .ToList();
         }
 
-        public bool ExistsInContext(Account account)
-        {
-            if(account != null)
-            {
-                Account accountInContext = FindByNumber(account.Number);
-                if(accountInContext != null)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
+        
     }
 }
