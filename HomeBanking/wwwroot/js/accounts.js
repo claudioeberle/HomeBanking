@@ -8,7 +8,7 @@ var app = new Vue({
     },
     methods:{
         getData: function(){
-            //axios.get("/api/clients/7")
+            //axios.get("/api/clients/1")
             axios.get("/api/clients/current")
             .then(function (response) {
                 //get client ifo

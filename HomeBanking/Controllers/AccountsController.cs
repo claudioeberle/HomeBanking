@@ -103,6 +103,48 @@ namespace HomeBanking.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult GetByClient(long clientId)
+        {
+            try
+            {
+                IEnumerable<Account> accounts = _accountRepository.GetAccountsByClient(clientId);
+
+                if(accounts == null)
+                {
+                    return Forbid();
+                }
+
+                List<AccountDTO> accountsDTO = new List<AccountDTO>();
+
+                foreach (Account account in accounts)
+                {
+                    AccountDTO accountDTO = new AccountDTO()
+                    {
+                        Id = account.Id,
+                        Number = account.Number,
+                        CreationDate = account.CreationDate,
+                        Balance = account.Balance,
+                        Transactions = account.Transactions.Select(tr => new TransactionDTO
+                        {
+                            Id = tr.Id,
+                            Date = tr.Date,
+                            Type = tr.Type,
+                            Amount = tr.Amount,
+                            Description = tr.Description
+                        }).ToList(),
+                    };
+                    accountsDTO.Add(accountDTO);
+                }
+                return Ok(accountsDTO);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         [HttpPost]
         public AccountDTO Post(long clientId)
         {

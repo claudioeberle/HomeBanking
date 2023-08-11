@@ -18,7 +18,7 @@ namespace HomeBanking.Repositories
 
         public Account FindByNumber(string number)
         {
-            return FindByCondition(ac => ac.Number == number)
+            return FindByCondition(ac => ac.Number.ToUpper() == number.ToUpper())
                 .Include(Account => Account.Transactions)
                 .FirstOrDefault();
         }
@@ -30,7 +30,14 @@ namespace HomeBanking.Repositories
 
         public void Save(Account account)
         {
-            Create(account);
+            if(account.Id == 0)
+            {
+                Create(account);
+            }
+            else
+            {
+                Update(account);
+            }
             SaveChanges();
         }
 
@@ -41,6 +48,17 @@ namespace HomeBanking.Repositories
                 .ToList();
         }
 
-        
+        public bool ExistsInContext(Account account)
+        {
+            if(account != null)
+            {
+                Account accountInContext = FindByNumber(account.Number);
+                if(accountInContext != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace HomeBanking.Repositories
         Account FindByNumber(string number);
         void Save(Account account);
         IEnumerable<Account> GetAccountsByClient(long clientId);
+        bool ExistsInContext(Account account);
     }
 }

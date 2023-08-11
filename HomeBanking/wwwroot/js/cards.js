@@ -10,7 +10,7 @@
     },
     methods: {
         getData: function () {
-            //axios.get("/api/clients/9")
+            //axios.get("/api/clients/1")
             axios.get("/api/clients/current")
                 .then(function (response) {
                     //get client ifo

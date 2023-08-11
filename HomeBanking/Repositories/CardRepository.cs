@@ -17,7 +17,7 @@ namespace HomeBanking.Repositories
 
         public IEnumerable<Card> GetAllCards()
         {
-            throw new System.NotImplementedException();
+            return FindAll();
         }
 
         public void Save(Card card)

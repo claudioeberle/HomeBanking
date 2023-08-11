@@ -261,7 +261,6 @@ namespace HomeBanking.Controllers
         [HttpGet("current/accounts")]
         public IActionResult GetAccounts()
         {
-            IEnumerable<AccountDTO> accounts;
 
             try
             {
@@ -278,14 +277,14 @@ namespace HomeBanking.Controllers
                     return Forbid();
                 }
 
-                accounts = client.Accounts.Select(ac => new AccountDTO
+                var accounts = client.Accounts.Select(ac => new AccountDTO
                 {
                     Id = ac.Id,
                     Balance = ac.Balance,
                     CreationDate = ac.CreationDate,
-                    Number = ac.Number,
+                    Number = ac.Number
+
                 }).ToList();
-                
 
                 return Ok(accounts);
             }
@@ -399,8 +398,8 @@ namespace HomeBanking.Controllers
                 //validate data
                 if (String.IsNullOrEmpty(card.Type) ||
                     String.IsNullOrEmpty(card.Color) ||
-                    !Card.IsCardType(card.Type) ||
-                    !Card.IsCardColor(card.Color))
+                    !Validators.IsCardType(card.Type) ||
+                    !Validators.IsCardColor(card.Color))
                 {
                     return StatusCode(403, "Invalid Data");
                 }

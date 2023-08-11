@@ -31,8 +31,8 @@ namespace HomeBanking.Controllers
             {
                 if (String.IsNullOrEmpty(card.Type) ||
                     String.IsNullOrEmpty(card.Color) ||
-                    !Card.IsCardType(card.Type) ||
-                    !Card.IsCardColor(card.Color) ||
+                    !Validators.IsCardType(card.Type) ||
+                    !Validators.IsCardColor(card.Color) ||
                     String.IsNullOrEmpty(cardHolder) ||
                     clientID <= 0)
                 {
