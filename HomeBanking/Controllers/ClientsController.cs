@@ -220,10 +220,10 @@ namespace HomeBanking.Controllers
             try
             {
                 //validate data
-                if(String.IsNullOrEmpty(client.Email) ||
-                    String.IsNullOrEmpty(client.Password) ||
-                    String.IsNullOrEmpty(client.FirstName) ||
-                    String.IsNullOrEmpty(client.LastName))
+                if(Validators.IsValidEmail(client.Email) ||
+                    Validators.IsValidPassword(client.Password) ||
+                    Validators.IsValidName(client.FirstName) ||
+                    Validators.IsValidName(client.LastName))
                 {
                     return StatusCode(403, "Invalid Data");
                 }
