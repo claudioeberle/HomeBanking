@@ -75,13 +75,14 @@ namespace HomeBanking.Controllers
                     return Forbid("No payments given in loan application");
                 }
 
+                //check payments are valid for the loan type and for the data type
                 if (!loan.Payments.Contains(loanApplicationDTO.Payments) 
                     && int.TryParse(loanApplicationDTO.Payments, out loanPaymentsInt))
                 {
                     return Forbid("Inconsistency between application loan payments and type loan payments");
                 }
 
-                //get ToAccount fro repository
+                //get ToAccount from repository
                 var toAccount = _accountRepository.FindByNumber(loanApplicationDTO.ToAccountNumber);
                 if (toAccount == null)
                 {
