@@ -111,17 +111,17 @@ namespace HomeBanking.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult get()
         {
             IEnumerable<Transaction> transactions = _transactionRepository.GetAllTransactions();
-            if(transactions == null)
+            if (transactions == null)
             {
                 return Forbid("Could not access to transactions");
             }
 
             List<TransactionDTO> transactionsDTO = new List<TransactionDTO>();
 
-            foreach(Transaction transaction in transactions)
+            foreach (Transaction transaction in transactions)
             {
                 transactionsDTO.Add(new TransactionDTO()
                 {
@@ -131,7 +131,6 @@ namespace HomeBanking.Controllers
                     Date = transaction.Date,
                 });
             }
-
             return Ok(transactionsDTO);
         }
     }

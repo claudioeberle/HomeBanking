@@ -45,6 +45,10 @@ namespace HomeBanking
             services.AddScoped<CardsController>();
             // add TransactionRepository
             services.AddScoped<ITransactionRepository, TransactionRepository>();
+            //Add ClientLoanRepository
+            services.AddScoped<IClientLoanRepository, ClientLoanRepository>();
+            //add loanRepository
+            services.AddScoped<ILoanRepository, LoanRepository>();
             //Add JsonSerializer options to services
             services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
             //authentication
