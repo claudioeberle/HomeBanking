@@ -17,7 +17,7 @@ namespace HomeBanking.Repositories
 
         public IEnumerable<Loan> GetAllLoans()
         {
-            return FindAll();
+            return FindAll().ToList();
         }
     }
 }
